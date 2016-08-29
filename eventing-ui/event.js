@@ -43,7 +43,7 @@ mnPluggableUiRegistryProvider.registerConfig({
     }]);
 
     ev.run(['$http', '$window', function($http, $window) {
-        $http.get('/_p/ui/event/get_application')
+        $http.get('/_p/event/get_application/')
         .then(function(response) {
             for(var i = 0; i < response.data.length; i++) {
                 response.data[i].depcfg = JSON.stringify(response.data[i].depcfg, null, ' ');
@@ -52,7 +52,7 @@ mnPluggableUiRegistryProvider.registerConfig({
         });
         $window.onbeforeunload = function(e) {
             e.preventDefault();
-            $window.setTimeout(function () { $window.location = e.srcElement.origin + '/event.html/'; }, 0);
+            $window.setTimeout(function () { $window.location = e.srcElement.origin + '/ui/index.html#/event/applications'; }, 0);
             $window.onbeforeunload = null;
         };
     }]);
@@ -102,7 +102,7 @@ mnPluggableUiRegistryProvider.registerConfig({
 
     ev.controller('PerAppController', ['$location', '$http', function($location, $http) {
         this.currentApp = null;
-        var appName = $location.path().slice(1);
+        var appName = $location.path().slice(7);
         for(var i = 0; i < applications.length; i++) {
             if(applications[i].name === appName) {
                 this.currentApp = applications[i];
@@ -114,7 +114,7 @@ mnPluggableUiRegistryProvider.registerConfig({
             this.currentApp.deploy = true;
             var x = angular.copy(this.currentApp);
             x.depcfg = JSON.parse(x.depcfg);
-            var uri = 'http://localhost:6061/set_application/?name=' + this.currentApp.name;
+            var uri = '/_p/event/set_application/?name=' + this.currentApp.name;
             var res = $http.post(uri, x);
             res.success(function(data, status, headers, config) {
                 this.set_application = data;
@@ -130,7 +130,7 @@ mnPluggableUiRegistryProvider.registerConfig({
 
         this.startDbg = function() {
             this.currentApp.debug = true;
-            var uri = 'http://localhost:6061/start_dbg/?name=' + this.currentApp.name;
+            var uri = '/_p/event/start_dbg/?name=' + this.currentApp.name;
             var res = $http.post(uri, null);
             res.success(function(data, status, headers, config) {
                 this.set_application = data;
@@ -141,7 +141,7 @@ mnPluggableUiRegistryProvider.registerConfig({
         }
         this.stopDbg = function() {
             this.currentApp.debug = false;
-            var uri = 'http://localhost:6061/stop_dbg/?name=' + this.currentApp.name;
+            var uri = '/_p/event/stop_dbg/?name=' + this.currentApp.name;
             var res = $http.post(uri, null);
             res.success(function(data, status, headers, config) {
                 this.set_application = data;
