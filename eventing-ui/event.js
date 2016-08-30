@@ -100,7 +100,7 @@ mnPluggableUiRegistryProvider.registerConfig({
         }
     }]);
 
-    ev.controller('PerAppController', ['$location', '$http', '$httpParamSerializer', function($location, $http, $httpParamSerializer) {
+    ev.controller('PerAppController', ['$location', '$http', function($location, $http) {
         this.currentApp = null;
         var appName = $location.path().slice(7);
         for(var i = 0; i < applications.length; i++) {
@@ -113,9 +113,8 @@ mnPluggableUiRegistryProvider.registerConfig({
         this.deployApplication = function() {
             this.currentApp.deploy = true;
             var x = angular.copy(this.currentApp);
-            x.depcfg = JSON.parse(x.depcfg);
             var uri = '/_p/event/set_application/?name=' + this.currentApp.name;
-            var encodedApp = $httpParamSerializer(x);
+            var encodedApp = JSON.stringify(x);
             var res = $http({url: uri,
                 method: "POST",
                 headers: {'Content-Type': 'application/json'},
