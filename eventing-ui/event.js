@@ -113,12 +113,15 @@ mnPluggableUiRegistryProvider.registerConfig({
         this.deployApplication = function() {
             this.currentApp.deploy = true;
             var x = angular.copy(this.currentApp);
+            x.depcfg = JSON.parse(x.depcfg);
             var uri = '/_p/event/set_application/?name=' + this.currentApp.name;
-            var encodedApp = JSON.stringify(x);
             var res = $http({url: uri,
                 method: "POST",
+                mnHttp: {
+                        isNotForm: true
+                  },
                 headers: {'Content-Type': 'application/json'},
-                data: encodedApp
+                data: x
             });
             res.success(function(data, status, headers, config) {
                 this.set_application = data;
@@ -202,8 +205,6 @@ mnPluggableUiRegistryProvider.registerConfig({
         return {
             restrict: 'A',
             scope: false,
-            controller: 'ResEditorController',
-            controllerAs: 'resEditCtrl',
             link: function(scope, element, attrs) {
                 var fn = $parse(attrs.onReadFile);
                 element.on('change', function(onChangeEvent) {
