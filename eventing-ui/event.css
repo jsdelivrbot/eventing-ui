@@ -13,12 +13,20 @@
     background: #F0EEE7;
 }
 
+.event_right {
+    position:absolute;
+    left:1000px; top:92px; bottom: 0;
+    width: 100%;
+    background: #F0EEE7;
+}
+
 .event_main {
     position: absolute;
-    left:178px; top:92px; right:0; bottom:0;
+    left:178px; top:92px; right:1000px; bottom:0;
     background: white;
     color: black;
     height: 100%;
 }
 
-.ace_editor { height:600px;width:1250px  }
+.ace_editor { height:600px;width:100%}
+

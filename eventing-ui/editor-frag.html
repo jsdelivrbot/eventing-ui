@@ -1,5 +1,5 @@
 <div class="event_main">
-    <div ng-show="resEditCtrl.showJsonEditor" ng-model="resEditCtrl.currentApp.depcfg" ng-readonly="resEditCtrl.currentApp.deploy" ui-ace="{mode: 'json', useWrapMode:true,}">
+    <div ng-show="resEditCtrl.showJsonEditor" ng-model="resEditCtrl.currentApp.depcfg" ng-readonly="resEditCtrl.currentApp.deploy" ui-ace="{mode: 'json', useWrapMode:true, }">
     </div>
     <div ng-show="resEditCtrl.showLoading">
         <br><br><br><br>
@@ -19,6 +19,22 @@
                 </tr>
         </table>
     </div>
-    <div ng-show="resEditCtrl.showJSEditor" ng-model="resEditCtrl.currentApp.handlers" ng-readonly="resEditCtrl.currentApp.deploy" ui-ace="{mode: 'javascript', useWrapMode:true,}">
+    <div ng-show="resEditCtrl.showJSEditor" ng-model="resEditCtrl.currentApp.handlers" ng-readonly="resEditCtrl.currentApp.deploy" ui-ace="{mode: 'javascript', useWrapMode:true, onLoad:resEditCtrl.aceLoaded}">
     </div>
 </div>
+<div class="event_right" ng-show="resEditCtrl.currentApp.debug">
+    <br><br><br>
+    <p><button ng-click="resEditCtrl.setBreakpoint()"> Set Breakpint </button></p>
+    <p><button> Clear Breakpint </button></p>
+    <p><button> Continue </button></p>
+    <p><button> Step Over </button></p>
+    <p><button> Step Into </button></p>
+    <p>
+    <button ng-click="resEditCtrl.listBreakpoints()"> List Breakpint </button>
+    <br>
+    {{resEditCtrl.response}}
+    </p>
+    <br><br><br>
+    <button> Watch </button>
+</div>
+

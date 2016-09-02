@@ -160,7 +160,7 @@ mnPluggableUiRegistryProvider.registerConfig({
 
     }]);
 
-    ev.controller('ResEditorController', ['$location', function($location){
+    ev.controller('ResEditorController', ['$location', '$http', function($location, $http){
         this.currentApp = null;
         var values = $location.path().split('/');
         appName = values[2];
@@ -170,8 +170,7 @@ mnPluggableUiRegistryProvider.registerConfig({
                 break;
             }
         }
-        console.log(appName, this.currentApp.name);
-        console.log(values[3]);
+        console.log(this.currentApp.name);
         if(values[3] == 'Deployment Plan') {
             this.showJsonEditor = true;
             this.showJSEditor = false;
@@ -194,10 +193,73 @@ mnPluggableUiRegistryProvider.registerConfig({
         }
         this.saveAsset = function(asset, content) {
             this.currentApp.assets.push({name:asset.name, content:content, operation:"add", id:this.currentApp.assets.length});
-        };
+        }
         this.deleteAsset = function(asset) {
             asset.operation = "delete";
             asset.content = null;
+        }
+        this.lineNum = null;
+        this.response = null;
+        parent = this;
+        this.aceLoaded = function(editor) {
+            editor.on("click", function(e){
+                parent.lineNum = e.getDocumentPosition().row;
+                console.log("selected line:", parent.lineNum);
+            });
+        }
+        this.setBreakpoint = function() {
+            if (parent.lineNum == null) {
+                alert("Select line number to set breakpoint");
+            }
+            else {
+                var command = {
+                            'seq' : 1,
+                            'type': "request",
+                            'command': "setbreakpoint",
+                            'arguments' : {
+                                            'type' : 'script',
+                                            'line' : parent.lineNum,
+                                          }
+                };
+                var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=setbreakpoint';
+                var res = $http({url: uri,
+                    method: "POST",
+                    mnHttp: {
+                        isNotForm: true
+                    },
+                    headers: {'Content-Type': 'application/json'},
+                    data: command
+                });
+                res.success(function(data, status, headers, config) {
+                    var response = data;
+                });
+                res.error(function(data, status, headers, config) {
+                    alert( "failure message: " + JSON.stringify({data: data}));
+                });
+                parent.lineNum = null;
+            }
+        }
+        this.listBreakpoints = function() {
+            var command = {
+                'seq' : 1,
+                'type' : "request",
+                'command' : "listbreakpoints"
+            };
+            var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=listbreakpoints';
+            var res = $http({url: uri,
+                    method: "POST",
+                    mnHttp: {
+                        isNotForm: true
+                    },
+                    headers: {'Content-Type': 'application/json'},
+                    data: command
+                });
+            res.success(function(data, status, headers, config) {
+                parent.response = data;
+            });
+            res.error(function(data, status, headers, config) {
+                alert( "failure message: " + JSON.stringify({data: data}));
+            });
         }
     }]);
 
@@ -219,6 +281,5 @@ mnPluggableUiRegistryProvider.registerConfig({
             }
         };
     }]);
-  angular.module('mnAdmin').requires.push('event');
+    angular.module('mnAdmin').requires.push('event');
 })();
-
