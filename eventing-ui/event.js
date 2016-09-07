@@ -50,11 +50,11 @@ mnPluggableUiRegistryProvider.registerConfig({
                 applications.push(response.data[i]);
             }
         });
-        $window.onbeforeunload = function(e) {
+        /*$window.onbeforeunload = function(e) {
             e.preventDefault();
-            $window.setTimeout(function () { $window.location = e.srcElement.origin + '/ui/index.html#/event/applications'; }, 0);
+            $window.setTimeout(function () { $window.location = e.srcElement.origin + '/ui/index.html'; }, 0);
             $window.onbeforeunload = null;
-        };
+        };*/
     }]);
 
     ev.directive('appListsLeftPanel', function(){

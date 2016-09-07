@@ -22,7 +22,7 @@
     <div ng-show="resEditCtrl.showJSEditor" ng-model="resEditCtrl.currentApp.handlers" ng-readonly="resEditCtrl.currentApp.deploy" ui-ace="{mode: 'javascript', useWrapMode:true, onLoad:resEditCtrl.aceLoaded}">
     </div>
 </div>
-<div class="event_right" ng-show="resEditCtrl.currentApp.debug">
+<div class="event_right" ng-show="resEditCtrl.showJSEditor && resEditCtrl.currentApp.debug">
     <br><br><br>
     <p><button ng-click="resEditCtrl.setBreakpoint()"> Set Breakpint </button></p>
     <p><button> Clear Breakpint </button></p>
