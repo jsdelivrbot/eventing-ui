@@ -40,4 +40,8 @@
     font-size: 12px;
 }
 .ace_editor { height:800px;width:1800px}
-
+.setMarker {
+      position:absolute;
+        background:red;
+          z-index:20
+      }

@@ -1,6 +1,7 @@
 (function() {
     var ev = angular.module('event', ['ui.ace', 'ui.router', 'mnPluggableUiRegistry']);
     var applications = [];
+    var appLoaded = false;
     var resources = [
         {id:0, name:'Deployment Plan'},
         {id:1, name:'Static Resources'},
@@ -49,6 +50,7 @@ mnPluggableUiRegistryProvider.registerConfig({
                 response.data[i].depcfg = JSON.stringify(response.data[i].depcfg, null, ' ');
                 applications.push(response.data[i]);
             }
+            appLoaded = true;
         });
         /*$window.onbeforeunload = function(e) {
             e.preventDefault();
@@ -67,7 +69,18 @@ mnPluggableUiRegistryProvider.registerConfig({
     });
 
 
-    ev.controller('CreateController',[function() {
+    ev.controller('CreateController',['$http', function($http) {
+    if(!appLoaded) {
+    $http.get('/_p/event/get_application/')
+        .then(function(response) {
+            for(var i = 0; i < response.data.length; i++) {
+                response.data[i].depcfg = JSON.stringify(response.data[i].depcfg, null, ' ');
+                applications.push(response.data[i]);
+            }
+        });
+     appLoaded = true;
+    }
+
         this.showCreation = true;
         this.applications = applications;
         this.createApplication = function(application) {
@@ -200,11 +213,15 @@ mnPluggableUiRegistryProvider.registerConfig({
         }
         this.lineNum = null;
         this.response = null;
+        this.editor = null;
         parent = this;
         this.aceLoaded = function(editor) {
+            parent.editor = editor;
             editor.on("click", function(e){
                 parent.lineNum = e.getDocumentPosition().row;
-                console.log("selected line:", parent.lineNum);
+                    console.log("Set breakpoint at :", parent.lineNum);
+                    var Range = require("ace/range").Range
+                editor.session.addMarker(new Range(parent.lineNum, 0, parent.lineNum, 1), 'setMarker', 'fullLine');
             });
         }
         this.setBreakpoint = function() {
@@ -236,6 +253,7 @@ mnPluggableUiRegistryProvider.registerConfig({
                 res.error(function(data, status, headers, config) {
                     alert( "failure message: " + JSON.stringify({data: data}));
                 });
+
                 parent.lineNum = null;
             }
         }
