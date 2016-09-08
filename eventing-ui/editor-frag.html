@@ -19,22 +19,20 @@
                 </tr>
         </table>
     </div>
+    <div stype="padding:6px" ng-show="resEditCtrl.showJSEditor && resEditCtrl.currentApp.debug">
+        <button class="btn_1" ng-click="resEditCtrl.setBreakpoint()"> Set Breakpint </button>
+        <button class="btn_1" ng-click="resEditCtrl.clearBreakpoints()"> Clear All Breakpint </button>
+        <button class="btn_1" ng-click="resEditCtrl.listBreakpoints()"> List Breakpints </button>
+        <button class="btn_1" ng-click="resEditCtrl.continue()"> Continue </button>
+        <button class="btn_1" ng-click="resEditCtrl.singleStep()"> Single Step </button>
+        <button class="btn_1" ng-click="resEditCtrl.stepOver()"> Step Over </button>
+        <button class="btn_1" ng-click="resEditCtrl.stepInto()"> Step Into </button>
+        <button style="float: right;" class="btn_1" ng-click="resEditCtrl.setMutation()"> Simulate Mutation </button>
+    </div>
+    <div class="dbg_frame" ng-show="resEditCtrl.showJSEditor && resEditCtrl.currentApp.debug">
+        {{resEditCtrl.response}}
+    </div>
     <div ng-show="resEditCtrl.showJSEditor" ng-model="resEditCtrl.currentApp.handlers" ng-readonly="resEditCtrl.currentApp.deploy" ui-ace="{mode: 'javascript', useWrapMode:true, onLoad:resEditCtrl.aceLoaded}">
     </div>
-</div>
-<div class="event_right" ng-show="resEditCtrl.showJSEditor && resEditCtrl.currentApp.debug">
-    <br><br><br>
-    <p><button ng-click="resEditCtrl.setBreakpoint()"> Set Breakpint </button></p>
-    <p><button> Clear Breakpint </button></p>
-    <p><button> Continue </button></p>
-    <p><button> Step Over </button></p>
-    <p><button> Step Into </button></p>
-    <p>
-    <button ng-click="resEditCtrl.listBreakpoints()"> List Breakpint </button>
-    <br>
-    {{resEditCtrl.response}}
-    </p>
-    <br><br><br>
-    <button> Watch </button>
 </div>
 

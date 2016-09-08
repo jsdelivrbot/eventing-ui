@@ -39,9 +39,14 @@
     font-family: Times;
     font-size: 12px;
 }
+.dbg_frame {
+    padding: 10px;
+    font-family: Courier;
+    font-size: 12px;
+    background: aquamarine;
+}
 .ace_editor { height:800px;width:1800px}
 .setMarker {
-      position:absolute;
-        background:red;
-          z-index:20
-      }
+    border-radius: 20px 0px 0px 20px;
+        box-shadow: 0px 0px 1px 1px red inset;
+}

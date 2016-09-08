@@ -52,11 +52,11 @@ mnPluggableUiRegistryProvider.registerConfig({
             }
             appLoaded = true;
         });
-        /*$window.onbeforeunload = function(e) {
+        $window.onbeforeunload = function(e) {
             e.preventDefault();
-            $window.setTimeout(function () { $window.location = e.srcElement.origin + '/ui/index.html'; }, 0);
+            $window.setTimeout(function () { $window.location = e.srcElement.origin + '/ui/index.html#/event/applications'; }, 0);
             $window.onbeforeunload = null;
-        };*/
+        };
     }]);
 
     ev.directive('appListsLeftPanel', function(){
@@ -183,7 +183,6 @@ mnPluggableUiRegistryProvider.registerConfig({
                 break;
             }
         }
-        console.log(this.currentApp.name);
         if(values[3] == 'Deployment Plan') {
             this.showJsonEditor = true;
             this.showJSEditor = false;
@@ -214,14 +213,13 @@ mnPluggableUiRegistryProvider.registerConfig({
         this.lineNum = null;
         this.response = null;
         this.editor = null;
+        this.breakpoints = [];
         parent = this;
         this.aceLoaded = function(editor) {
             parent.editor = editor;
             editor.on("click", function(e){
                 parent.lineNum = e.getDocumentPosition().row;
-                    console.log("Set breakpoint at :", parent.lineNum);
-                    var Range = require("ace/range").Range
-                editor.session.addMarker(new Range(parent.lineNum, 0, parent.lineNum, 1), 'setMarker', 'fullLine');
+                    console.log("Set/clear breakpoint at :", parent.lineNum);
             });
         }
         this.setBreakpoint = function() {
@@ -234,8 +232,9 @@ mnPluggableUiRegistryProvider.registerConfig({
                             'type': "request",
                             'command': "setbreakpoint",
                             'arguments' : {
-                                            'type' : 'script',
-                                            'line' : parent.lineNum,
+                                            'type' : 'function',
+                                            'line' : parent.lineNum + 1,
+                                            'target' : 'OnUpdate',
                                           }
                 };
                 var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=setbreakpoint';
@@ -248,14 +247,47 @@ mnPluggableUiRegistryProvider.registerConfig({
                     data: command
                 });
                 res.success(function(data, status, headers, config) {
-                    var response = data;
+                    parent.response = data;
                 });
                 res.error(function(data, status, headers, config) {
                     alert( "failure message: " + JSON.stringify({data: data}));
                 });
 
+                parent.editor.session.setBreakpoint(parent.lineNum, 'setMarker');
+                parent.breakpoints.push(parent.lineNum);
                 parent.lineNum = null;
             }
+        }
+        this.clearBreakpoints = function() {
+                var command = {
+                            'seq' : 1,
+                            'type': "request",
+                            'command': "clearbreakpoint",
+                            'arguments' : {
+                                            'type' : 'script',
+                                            'breakpoint' : parent.breakpoints.length,
+                                          }
+                };
+                var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=clearbreakpoint';
+                var res = $http({url: uri,
+                    method: "POST",
+                    mnHttp: {
+                        isNotForm: true
+                    },
+                    headers: {'Content-Type': 'application/json'},
+                    data: command
+                });
+                res.success(function(data, status, headers, config) {
+                    parent.response = data;
+                });
+                res.error(function(data, status, headers, config) {
+                    alert( "failure message: " + JSON.stringify({data: data}));
+                });
+
+                for (var i = 0; i < parent.breakpoints.length; i++) {
+                    parent.editor.session.clearBreakpoint(parent.breakpoints[i]);
+                }
+                parent.breakpoints = [];
         }
         this.listBreakpoints = function() {
             var command = {
@@ -279,6 +311,56 @@ mnPluggableUiRegistryProvider.registerConfig({
                 alert( "failure message: " + JSON.stringify({data: data}));
             });
         }
+        this.setMutation =  function() {
+            $http.get('/_p/event/store_blob/?appname=' + this.currentApp.name);
+        }
+        this.continue = function() {
+            var command = {
+                'seq' : 1,
+                'type' : "request",
+                'command' : "continue"
+            };
+            var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=continue';
+            var res = $http({url: uri,
+                    method: "POST",
+                    mnHttp: {
+                        isNotForm: true
+                    },
+                    headers: {'Content-Type': 'application/json'},
+                    data: command
+                });
+            res.success(function(data, status, headers, config) {
+                parent.response = data;
+            });
+            res.error(function(data, status, headers, config) {
+                alert( "failure message: " + JSON.stringify({data: data}));
+            });
+        }
+        this.singleStep = function() {
+            var command = {
+                'seq' : 1,
+                'type' : "request",
+                'command' : "continue",
+                'arguments' : {"stepaction" : "next",
+                                "stepcount": 1}
+            };
+            var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=continue';
+            var res = $http({url: uri,
+                    method: "POST",
+                    mnHttp: {
+                        isNotForm: true
+                    },
+                    headers: {'Content-Type': 'application/json'},
+                    data: command
+                });
+            res.success(function(data, status, headers, config) {
+                parent.response = data;
+            });
+            res.error(function(data, status, headers, config) {
+                alert( "failure message: " + JSON.stringify({data: data}));
+            });
+        }
+
     }]);
 
     ev.directive('onReadFile', ['$parse', function ($parse) {
