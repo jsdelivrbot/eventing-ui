@@ -52,11 +52,6 @@ mnPluggableUiRegistryProvider.registerConfig({
             }
             appLoaded = true;
         });
-        $window.onbeforeunload = function(e) {
-            e.preventDefault();
-            $window.setTimeout(function () { $window.location = e.srcElement.origin + '/ui/index.html#/event/applications'; }, 0);
-            $window.onbeforeunload = null;
-        };
     }]);
 
     ev.directive('appListsLeftPanel', function(){
