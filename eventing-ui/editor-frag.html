@@ -31,6 +31,7 @@
         <p style="padding:6px">
             <input type="text" ng-model="resEditCtrl.watchVar" placeholder="Enter expression to evaluate">
             <button class="btn_1" ng-click="resEditCtrl.evalExpr()"> Evaluate </button>
+            <button style="float: right;" class="btn_1" ng-click="resEditCtrl.showHistory()"> Debug History </button>
         </p>
     </div>
     <div class="dbg_frame" ng-show="resEditCtrl.showJSEditor && resEditCtrl.currentApp.debug">

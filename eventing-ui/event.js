@@ -211,6 +211,25 @@ mnPluggableUiRegistryProvider.registerConfig({
         this.breakpoints = [];
         this.watchVar = null;
         parent = this;
+
+        function sendPostCommand(uri, command) {
+            var res = $http({url: uri,
+                    method: "POST",
+                    mnHttp: {
+                        isNotForm: true
+                    },
+                    headers: {'Content-Type': 'application/json'},
+                    data: command
+                });
+                res.success(function(data, status, headers, config) {
+                    parent.response = data;
+                });
+                res.error(function(data, status, headers, config) {
+                    alert( "failure message: " + JSON.stringify({data: data}));
+                });
+        }
+
+
         this.aceLoaded = function(editor) {
             parent.editor = editor;
             editor.on("click", function(e){
@@ -234,21 +253,7 @@ mnPluggableUiRegistryProvider.registerConfig({
                                           }
                 };
                 var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=setbreakpoint';
-                var res = $http({url: uri,
-                    method: "POST",
-                    mnHttp: {
-                        isNotForm: true
-                    },
-                    headers: {'Content-Type': 'application/json'},
-                    data: command
-                });
-                res.success(function(data, status, headers, config) {
-                    parent.response = data;
-                });
-                res.error(function(data, status, headers, config) {
-                    alert( "failure message: " + JSON.stringify({data: data}));
-                });
-
+                sendPostCommand(uri, command);
                 parent.editor.session.setBreakpoint(parent.lineNum, 'setMarker');
                 parent.breakpoints.push(parent.lineNum);
                 parent.lineNum = null;
@@ -265,21 +270,7 @@ mnPluggableUiRegistryProvider.registerConfig({
                                           }
                 };
                 var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=clearbreakpoint';
-                var res = $http({url: uri,
-                    method: "POST",
-                    mnHttp: {
-                        isNotForm: true
-                    },
-                    headers: {'Content-Type': 'application/json'},
-                    data: command
-                });
-                res.success(function(data, status, headers, config) {
-                    parent.response = data;
-                });
-                res.error(function(data, status, headers, config) {
-                    alert( "failure message: " + JSON.stringify({data: data}));
-                });
-
+                sendPostCommand(uri, command);
                 for (var i = 0; i < parent.breakpoints.length; i++) {
                     parent.editor.session.clearBreakpoint(parent.breakpoints[i]);
                 }
@@ -292,20 +283,7 @@ mnPluggableUiRegistryProvider.registerConfig({
                 'command' : "listbreakpoints"
             };
             var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=listbreakpoints';
-            var res = $http({url: uri,
-                    method: "POST",
-                    mnHttp: {
-                        isNotForm: true
-                    },
-                    headers: {'Content-Type': 'application/json'},
-                    data: command
-                });
-            res.success(function(data, status, headers, config) {
-                parent.response = data;
-            });
-            res.error(function(data, status, headers, config) {
-                alert( "failure message: " + JSON.stringify({data: data}));
-            });
+            sendPostCommand(uri, command);
         }
         this.setMutation =  function() {
             $http.get('/_p/event/store_blob/?appname=' + this.currentApp.name);
@@ -317,20 +295,7 @@ mnPluggableUiRegistryProvider.registerConfig({
                 'command' : "continue"
             };
             var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=continue';
-            var res = $http({url: uri,
-                    method: "POST",
-                    mnHttp: {
-                        isNotForm: true
-                    },
-                    headers: {'Content-Type': 'application/json'},
-                    data: command
-                });
-            res.success(function(data, status, headers, config) {
-                parent.response = data;
-            });
-            res.error(function(data, status, headers, config) {
-                alert( "failure message: " + JSON.stringify({data: data}));
-            });
+            sendPostCommand(uri, command);
         }
         this.singleStep = function() {
             var command = {
@@ -341,22 +306,30 @@ mnPluggableUiRegistryProvider.registerConfig({
                                 "stepcount": 1}
             };
             var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=continue';
-            var res = $http({url: uri,
-                    method: "POST",
-                    mnHttp: {
-                        isNotForm: true
-                    },
-                    headers: {'Content-Type': 'application/json'},
-                    data: command
-                });
-            res.success(function(data, status, headers, config) {
-                parent.response = data;
-            });
-            res.error(function(data, status, headers, config) {
-                alert( "failure message: " + JSON.stringify({data: data}));
-            });
+            sendPostCommand(uri, command);
         }
-
+	    this.stepInto = function() {
+            var command = {
+                'seq' : 1,
+                'type' : "request",
+                'command' : "continue",
+                'arguments' : {"stepaction" : "in",
+                                "stepcount": 1}
+            };
+            var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=continue';
+            sendPostCommand(uri, command);
+        }
+	    this.stepOut = function() {
+            var command = {
+                'seq' : 1,
+                'type' : "request",
+                'command' : "continue",
+                'arguments' : {"stepaction" : "out",
+                                "stepcount": 1}
+            };
+            var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=continue';
+            sendPostCommand(uri, command);
+        }
         this.evalExpr = function() {
             if(parent.watchVar == null) {
                 alert("Enter expression to evaluate");
@@ -367,23 +340,11 @@ mnPluggableUiRegistryProvider.registerConfig({
                     'type' : "request",
                     'command' : "evaluate",
                     'arguments' : {'expression' : parent.watchVar,
-                                    'global': false}
+                                    'global': false,
+				    'disable_break' : true}
                 };
                 var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=evaluate';
-                var res = $http({url: uri,
-                    method: "POST",
-                    mnHttp: {
-                        isNotForm: true
-                    },
-                    headers: {'Content-Type': 'application/json'},
-                    data: command
-                });
-                res.success(function(data, status, headers, config) {
-                    parent.response = data;
-                });
-                res.error(function(data, status, headers, config) {
-                    alert( "failure message: " + JSON.stringify({data: data}));
-                });
+                sendPostCommand(uri, command);
             }
             parent.watchVar = null;
         }
