@@ -209,6 +209,7 @@ mnPluggableUiRegistryProvider.registerConfig({
         this.response = null;
         this.editor = null;
         this.breakpoints = [];
+        this.watchVar = null;
         parent = this;
         this.aceLoaded = function(editor) {
             parent.editor = editor;
@@ -354,6 +355,37 @@ mnPluggableUiRegistryProvider.registerConfig({
             res.error(function(data, status, headers, config) {
                 alert( "failure message: " + JSON.stringify({data: data}));
             });
+        }
+
+        this.evalExpr = function() {
+            if(parent.watchVar == null) {
+                alert("Enter expression to evaluate");
+            }
+            else {
+                var command = {
+                    'seq' : 1,
+                    'type' : "request",
+                    'command' : "evaluate",
+                    'arguments' : {'expression' : parent.watchVar,
+                                    'global': false}
+                };
+                var uri ='/_p/event/debug?appname=' + this.currentApp.name + '&command=evaluate';
+                var res = $http({url: uri,
+                    method: "POST",
+                    mnHttp: {
+                        isNotForm: true
+                    },
+                    headers: {'Content-Type': 'application/json'},
+                    data: command
+                });
+                res.success(function(data, status, headers, config) {
+                    parent.response = data;
+                });
+                res.error(function(data, status, headers, config) {
+                    alert( "failure message: " + JSON.stringify({data: data}));
+                });
+            }
+            parent.watchVar = null;
         }
 
     }]);

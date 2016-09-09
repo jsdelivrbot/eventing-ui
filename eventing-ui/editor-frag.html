@@ -19,7 +19,7 @@
                 </tr>
         </table>
     </div>
-    <div stype="padding:6px" ng-show="resEditCtrl.showJSEditor && resEditCtrl.currentApp.debug">
+    <div style="padding:6px" ng-show="resEditCtrl.showJSEditor && resEditCtrl.currentApp.debug">
         <button class="btn_1" ng-click="resEditCtrl.setBreakpoint()"> Set Breakpint </button>
         <button class="btn_1" ng-click="resEditCtrl.clearBreakpoints()"> Clear All Breakpint </button>
         <button class="btn_1" ng-click="resEditCtrl.listBreakpoints()"> List Breakpints </button>
@@ -28,6 +28,10 @@
         <button class="btn_1" ng-click="resEditCtrl.stepOver()"> Step Over </button>
         <button class="btn_1" ng-click="resEditCtrl.stepInto()"> Step Into </button>
         <button style="float: right;" class="btn_1" ng-click="resEditCtrl.setMutation()"> Simulate Mutation </button>
+        <p style="padding:6px">
+            <input type="text" ng-model="resEditCtrl.watchVar" placeholder="Enter expression to evaluate">
+            <button class="btn_1" ng-click="resEditCtrl.evalExpr()"> Evaluate </button>
+        </p>
     </div>
     <div class="dbg_frame" ng-show="resEditCtrl.showJSEditor && resEditCtrl.currentApp.debug">
         {{resEditCtrl.response}}
