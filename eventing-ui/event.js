@@ -210,6 +210,8 @@ mnPluggableUiRegistryProvider.registerConfig({
         this.editor = null;
         this.breakpoints = [];
         this.watchVar = null;
+        this.showHistory = false;
+        this.dbgHistory = [];
         parent = this;
 
         function sendPostCommand(uri, command) {
@@ -223,6 +225,7 @@ mnPluggableUiRegistryProvider.registerConfig({
                 });
                 res.success(function(data, status, headers, config) {
                     parent.response = data;
+                    parent.dbgHistory.push({request:command, response:data});
                 });
                 res.error(function(data, status, headers, config) {
                     alert( "failure message: " + JSON.stringify({data: data}));
@@ -349,6 +352,14 @@ mnPluggableUiRegistryProvider.registerConfig({
             parent.watchVar = null;
         }
 
+        this.showDbgHistory = function() {
+            this.showJSEditor = false;
+            this.showHistory = true;
+        }
+        this.closeDbgHistory = function() {
+            this.showJSEditor = true;
+            this.showHistory = false;
+        }
     }]);
 
     ev.directive('onReadFile', ['$parse', function ($parse) {
